@@ -3,6 +3,11 @@ using System.Collections;
 
 public class testScript : MonoBehaviour {
 
+	// Making a Timer is easy and fun! There are multiple ways to do it! 
+	// Where do you start? 
+	// Hint 1: look at deltaTime in the Scripting Reference
+
+	
 	public float m_health = 10;
 	private bool m_isDead = false;
 
@@ -14,16 +19,6 @@ public class testScript : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 	
-		if(!m_isDead)
-		{
-			//m_health -= Time.deltaTime;
-
-			if(m_health < 0)
-			{
-				m_isDead = false;
-				successMessage();
-			}
-		}
 
 	}
 
