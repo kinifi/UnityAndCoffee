@@ -1,14 +1,17 @@
+/// Welcome to the daily challenge with Unity And Coffee!
+/// Description: Below we have a method called successMessage(); that prints a debug of success,
+/// We need successMessage() to be called when the timer has run out!
+// Hint 1: look at deltaTime in the Scripting Reference
+
 using UnityEngine;
 using System.Collections;
 
 public class testScript : MonoBehaviour {
 
-	// Making a Timer is easy and fun! There are multiple ways to do it! 
-	// Where do you start? 
-	// Hint 1: look at deltaTime in the Scripting Reference
-
+	//Float value to count down with
+	public float m_timer = 10.0f;
 	
-	public float m_health = 10;
+	//Use this bool to make sure the timer only call the success message once!
 	private bool m_isDead = false;
 
 	// Use this for initialization
@@ -17,6 +20,7 @@ public class testScript : MonoBehaviour {
 	}
 	
 	// Update is called once per frame
+	// Your Timer Code will go here
 	void Update () {
 	
 
