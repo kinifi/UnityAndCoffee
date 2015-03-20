@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEditor;
+using System;
 using System.IO;
 using System.Text;
 using System.Net;
@@ -23,7 +24,7 @@ public class UnityAndCoffee : EditorWindow {
 	{
 		//Show existing window instance. If one doesn't exist, make one.
 		EditorWindow.GetWindow(typeof(UnityAndCoffee));
-		Debug.Log("Starting Unity and Coffee");
+		//Debug.Log("Starting Unity and Coffee");
 
 	}
 
@@ -43,7 +44,7 @@ public class UnityAndCoffee : EditorWindow {
 		{
 			//set the value so we can reference if this is their first time or not
 			m_isFirstTime = EditorPrefs.GetBool("firstTime");
-			Debug.Log("Not First Time");
+			//Debug.Log("Not First Time");
 			m_isFirstTime = true;
 		}
 		else
@@ -101,32 +102,53 @@ public class UnityAndCoffee : EditorWindow {
 		}
 	}
 
+	/// <summary>
+	/// Loads the daily challenge from the github server
+	/// </summary>
 	private void loadDailyChallenge() {
 
+		//tell the user to wait in case their internet connection isn't the best
 		Debug.Log("Please Wait... Loading Daily Challenge");
-
+		//make a request for the data
 		HttpWebRequest myReq = (HttpWebRequest)WebRequest.Create("https://raw.githubusercontent.com/kinifi/UnityAndCoffee/master/Test.txt");
-
+		//get the data
 		WebResponse _myResponse = myReq.GetResponse ();
-
+		//stream from the top down and put all the data into a string
 		using (Stream stream = _myResponse.GetResponseStream())
 		{
 			StreamReader reader = new StreamReader(stream, Encoding.UTF8);
+			//close the stream at the end of the data
 			m_dailyPuzzle = reader.ReadToEnd();
 		}
-
+		//close the webrequest
 		_myResponse.Close();
 
+		//double check that the data isn't null or blank
 		if(m_dailyPuzzle != null)
 		{
+			//mark the daily puzzle is true. so we can display all the data
 			m_dailyLoadedPuzzle = true;
-			//Debug.Log(m_dailyPuzzle);
+
 		}
 		else
 		{
-			Debug.Log("puzzle is null" + m_dailyPuzzle);
+			Debug.LogError("puzzle is null " + m_dailyPuzzle + "  ");
 		}
 
+	}
+
+	private void makeFolderAndScript(string folderName, string fileName, string fileExtension, string challengeText)
+	{
+		//create the folder
+		Directory.CreateDirectory(Application.dataPath + "/" + folderName);
+		//create the file with the extension and put it into the folder
+		File.WriteAllText(Application.dataPath + "/" + folderName + "/" + fileName + fileExtension, challengeText);
+
+		//refresh the project folder
+		AssetDatabase.Refresh();
+
+		//tell the user to open the file
+		Debug.Log("Daily Challenge Puzzle Created! Open the " + shortDate() + fileExtension + " file and have fun! ");
 	}
 
 	private void OnGUI()
@@ -144,10 +166,11 @@ public class UnityAndCoffee : EditorWindow {
 		{
 			//Display the user data
 			GUILayout.BeginHorizontal();
+				//display the user name
 				GUILayout.Label(m_UserName);
 				//display the level for the player
 				GUILayout.Label("Level: " + m_Level);
-			GUILayout.EndHorizontal();
+			GUILayout.EndVertical();
 
 			GUILayout.Space(10);
 
@@ -165,8 +188,14 @@ public class UnityAndCoffee : EditorWindow {
 
 			if(m_dailyLoadedPuzzle)
 			{
-				GUILayout.Label("Daily Challenge Code");
+				GUILayout.Label("Daily Challenge Preview");
 				GUILayout.TextArea(m_dailyPuzzle, 10000);
+
+				if(GUILayout.Button("Play Daily Puzzle"))
+				{
+					makeFolderAndScript("DailyChallenge", shortDate(), ".cs", m_dailyPuzzle);
+				}
+
 				if(GUILayout.Button("Hide Daily Puzzle"))
 				{
 					m_dailyLoadedPuzzle = false;
@@ -232,6 +261,19 @@ public class UnityAndCoffee : EditorWindow {
 
 		}
 	}
-	
+
+	/// <summary>
+	/// Utility to create a short date in a format 
+	/// </summary>
+	/// <returns>The date.</returns>
+	private string shortDate()
+	{
+
+		string _date;
+
+		_date = DateTime.Now.Month + "_" + DateTime.Now.Day + "_" + DateTime.Now.Year;
+
+		return _date;
+	}
 
 }
