@@ -2,6 +2,7 @@
 /// Description: Below we have a method called successMessage(); that prints a debug of success,
 /// We need successMessage() to be called when the timer has run out!
 // Hint 1: look at deltaTime in the Scripting Reference
+// Hint 2: This can be solved with a special static method also instead of deltatime
 
 using UnityEngine;
 using System.Collections;
