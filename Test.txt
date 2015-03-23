@@ -7,7 +7,7 @@
 using UnityEngine;
 using System.Collections;
 
-public class testScript : MonoBehaviour {
+public class 3_23_2015 : MonoBehaviour {
 
 	//Float value to count down with
 	public float m_timer = 10.0f;
