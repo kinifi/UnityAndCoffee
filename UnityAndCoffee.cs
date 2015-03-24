@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEditor;
 using System;
 using System.IO;
@@ -14,10 +14,24 @@ public class UnityAndCoffee : EditorWindow {
 
 	//daily Puzzle
 	private bool m_dailyLoadedPuzzle = false;
+	//private bool m_dailySuccess = false;
 	private string m_dailyPuzzle;
+
+	//Scroll position
+	private Vector2 scrollPosition;
 
 	//Options
 	private bool m_showOptions = false;
+
+	//coffee cup image
+	private string m_coffeeCup =  "         )))     \n"
+								+ "        (((     \n"
+								+ "  +-----+   \n"
+								+ "  |              |]  \n"
+								+ "  `-----'   \n"
+								+ "___________ \n"
+								+ "`---------' ";
+
 
 	[MenuItem("Window/Unity AND Coffee")]
 	public static void ShowWindow()
@@ -32,6 +46,7 @@ public class UnityAndCoffee : EditorWindow {
 	{
 		//load the values needed when the window opens
 		loadSavedValues();
+
 	}
 
 	/// <summary>
@@ -72,6 +87,11 @@ public class UnityAndCoffee : EditorWindow {
 		//is this the first time the user is opening this?
 		if(!m_isFirstTime)
 		{
+			if(m_coffeeCup != null)
+			{
+				GUILayout.TextArea(m_coffeeCup);
+			}
+
 			//display the username with a text field
 			GUILayout.BeginHorizontal();
 				GUILayout.Label("Username:");
@@ -83,19 +103,17 @@ public class UnityAndCoffee : EditorWindow {
 
 			//setup button when the user is done entering information
 			//saves all the values for future use
-			if(GUILayout.Button("Setup"))
+
+			GUIStyle _style = new GUIStyle(GUI.skin.button);
+			_style.normal.textColor = Color.blue;
+
+			if(GUILayout.Button("Setup", _style))
 			{
 				//save the values so we can not show them later
 				m_isFirstTime = true;
 				EditorPrefs.SetInt("level", m_Level);
 				EditorPrefs.SetString("userName", m_UserName);
 				EditorPrefs.SetBool("firstTime", m_isFirstTime);
-			}
-
-			//
-			if(GUILayout.Button("Load Previous Values"))
-			{
-				loadSavedValues();
 			}
 
 			GUILayout.EndHorizontal();
@@ -137,6 +155,13 @@ public class UnityAndCoffee : EditorWindow {
 
 	}
 
+	/// <summary>
+	/// Makes the Folder and Script
+	/// </summary>
+	/// <param name="folderName">Folder name.</param>
+	/// <param name="fileName">File name.</param>
+	/// <param name="fileExtension">File extension.</param>
+	/// <param name="challengeText">Challenge text.</param>
 	private void makeFolderAndScript(string folderName, string fileName, string fileExtension, string challengeText)
 	{
 		//create the folder
@@ -154,9 +179,12 @@ public class UnityAndCoffee : EditorWindow {
 	private void OnGUI()
 	{
 
+		scrollPosition = GUILayout.BeginScrollView(scrollPosition);
+
 		GUILayout.Space(10);
 			GUILayout.Label("Unity & Coffee");
-			GUILayout.Label("Twitter: #unity3d @UnityAndCoffee");
+			GUILayout.Label("Twitter: #UnityAndCoffee @UnityAndCoffee");
+			GUILayout.TextArea(m_coffeeCup);
 		GUILayout.Space(10);
 
 		//Display the first TimeGUI
@@ -165,20 +193,34 @@ public class UnityAndCoffee : EditorWindow {
 		if(m_isFirstTime)
 		{
 			//Display the user data
-			GUILayout.BeginHorizontal();
+			GUILayout.BeginVertical();
 				//display the user name
-				GUILayout.Label(m_UserName);
+				GUILayout.Label("Username: " + m_UserName);
 				//display the level for the player
 				GUILayout.Label("Level: " + m_Level);
 			GUILayout.EndVertical();
 
-			GUILayout.Space(10);
+			GUILayout.Space(30);
 
-			if(GUILayout.Button("Daily Puzzle"))
+			if(!m_dailyLoadedPuzzle)
 			{
-				loadDailyChallenge();
+				if(GUILayout.Button("Daily Puzzle", GUILayout.Height(50)))
+				{
+					loadDailyChallenge();
+				}
 			}
+			else
+			{
+				GUILayout.BeginHorizontal();
 
+				if(GUILayout.Button("Success!"))
+				{
+					Debug.Log("Succcess pop up with tweet ability!");
+				}
+
+
+				GUILayout.EndHorizontal();
+			}
 
 			///////////////////////////////////
 			// Display Daily Puzzle
@@ -191,9 +233,10 @@ public class UnityAndCoffee : EditorWindow {
 				GUILayout.Label("Daily Challenge Preview");
 				GUILayout.TextArea(m_dailyPuzzle, 10000);
 
-				if(GUILayout.Button("Play Daily Puzzle"))
+				if(GUILayout.Button("Play Daily Puzzle", GUILayout.Height(50)))
 				{
 					makeFolderAndScript("DailyChallenge", shortDate(), ".cs", m_dailyPuzzle);
+					m_dailyLoadedPuzzle = false;
 				}
 
 				if(GUILayout.Button("Hide Daily Puzzle"))
@@ -210,6 +253,8 @@ public class UnityAndCoffee : EditorWindow {
 
 			GUILayout.Label("Help / Resources");
 
+			GUILayout.BeginHorizontal();
+
 			if(GUILayout.Button("Scripting Reference"))
 			{
 				Debug.Log("Opening Scripting Reference");
@@ -222,44 +267,74 @@ public class UnityAndCoffee : EditorWindow {
 				Application.OpenURL ("http://docs.unity3d.com/Manual/index.html");
 			}
 
+			GUILayout.EndHorizontal();
+
 			GUILayout.Space(10);
 
-			////////////////////////////////////////////////////
-			/// Options Display
-			////////////////////////////////////////////////////
-
-			if(!m_showOptions)
-			{
-				if(GUILayout.Button("Options"))
-				{
-					m_showOptions = true;
-				}
-			}
-			else
-			{
-				if(GUILayout.Button("Hide Options"))
-				{
-					m_showOptions = false;
-				}
-			}
-
-			if (m_showOptions)
-			{
-				if(GUILayout.Button("Clear User Data"))
-				{
-					EditorPrefs.DeleteKey("firstTime");
-					EditorPrefs.DeleteKey("level");
-					EditorPrefs.DeleteKey("userName");
-					Debug.Log("Cleared User Data.. Reopen Window");
-					this.Close();
-				}
-			}
-
-			////////////////////////////////////////////////////
-			/// 
-			////////////////////////////////////////////////////
+			//call the options menu
+			displayOptions();
 
 		}
+
+		GUILayout.EndScrollView();
+	}
+
+	/// <summary>
+	/// Display the options in the editor
+	/// </summary>
+	private void displayOptions()
+	{
+		
+		////////////////////////////////////////////////////
+		/// Options Display
+		////////////////////////////////////////////////////
+		
+		if(!m_showOptions)
+		{
+			if(GUILayout.Button("Options", GUILayout.Height(30)))
+			{
+				m_showOptions = true;
+			}
+		}
+		else
+		{
+			if(GUILayout.Button("Hide Options"))
+			{
+				m_showOptions = false;
+			}
+		}
+		
+		if (m_showOptions)
+		{
+			if(GUILayout.Button("Clear User Data"))
+			{
+				EditorPrefs.DeleteKey("firstTime");
+				EditorPrefs.DeleteKey("level");
+				EditorPrefs.DeleteKey("userName");
+				Debug.Log("Cleared User Data.. Reopen Window");
+				this.Close();
+			}
+		}
+		
+		////////////////////////////////////////////////////
+		/// 
+		////////////////////////////////////////////////////
+
+	}
+
+	/// <summary>
+	/// Shares to twitter.
+	/// </summary>
+	/// <param name="textToDisplay">Text to display.</param>
+	void ShareToTwitter (string textToDisplay = "")
+	{
+		textToDisplay = "I am now level: " + m_Level + " in Unity And Coffee! #unityandcoffee";
+		string TWITTER_ADDRESS = "http://twitter.com/intent/tweet";
+		string TWEET_LANGUAGE = "en"; 
+
+		Application.OpenURL(TWITTER_ADDRESS +
+		                    "?text=" + WWW.EscapeURL(textToDisplay) +
+		                    "&amp;lang=" + WWW.EscapeURL(TWEET_LANGUAGE));
 	}
 
 	/// <summary>
