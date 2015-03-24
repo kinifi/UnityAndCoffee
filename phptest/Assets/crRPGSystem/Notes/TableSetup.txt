@@ -1,0 +1,38 @@
+Sample database tables to get you started.
+Simply copy and paste the following into your database manager of choice.
+
+Please note: Since we want all tables to have the same UID for a specific person, only one table must have an autoincriment UID and then all other tables must get their value from that one. Since the 'login' table is created first, set that one to autoincriment.
+
+CREATE TABLE `login` (
+`UID` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
+`username` VARCHAR( 30 ) NOT NULL ,
+`passw` VARCHAR( 40 ) NOT NULL ,
+`status` INT UNSIGNED NOT NULL ,
+`dats` DATETIME NOT NULL ,
+`data` DATETIME NOT NULL ,
+PRIMARY KEY (  `UID` )
+) ENGINE = MYISAM ;
+
+CREATE TABLE `account` (
+`UID` INT UNSIGNED NOT NULL ,
+`name` VARCHAR( 30 ) NOT NULL ,
+`surname` VARCHAR( 30 ) NOT NULL ,
+`addr1` VARCHAR( 50 ) NOT NULL ,
+`addr2` VARCHAR( 50 ) NOT NULL ,
+`city` VARCHAR( 30 ) NOT NULL ,
+`state` VARCHAR( 30 ) NOT NULL ,
+`zip` VARCHAR( 15 ) NOT NULL ,
+`country` VARCHAR( 30 ) NOT NULL ,
+`email` VARCHAR( 50 ) NOT NULL ,
+`paypal` VARCHAR( 50 ) NOT NULL ,
+`notes` VARCHAR( 256 ) NOT NULL ,
+PRIMARY KEY (  `UID` )
+) ENGINE = MYISAM ;
+
+CREATE TABLE `activate` (
+`UID` INT UNSIGNED NOT NULL ,
+`email` VARCHAR( 50 ) NOT NULL ,
+PRIMARY KEY (  `UID` )
+) ENGINE = MYISAM ;
+
+That's it. You are ready to go :)
